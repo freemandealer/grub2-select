@@ -27,26 +27,29 @@ import os
 import sys
 import StringIO
 
+grub2cfg = "/mnt/grub/grub2/grub.cfg"
+grub2env = "/mnt/grub/grub2/grubenv"
+grub2boot = "/mnt/grub"
+
 class grub2select():
     menuCount = 1
     menuData = {}
     grub2cfgData = StringIO.StringIO()
     grubEnvData = StringIO.StringIO()
-    grub2cfg = "/boot/grub2/grub.cfg"
     grubDefault = str(None)
     grubDefaultMatch = None
     
 
     def parseGrubCfg(self):
         """read in 'grub.cfg' and 'grub2-editenv list' and parse data"""
-        if not os.path.exists(self.grub2cfg):
-            print("unable to locate %s, is grub2 installed?" % self.grub2cfg)
+        if not os.path.exists(grub2cfg):
+            print("unable to locate %s, is grub2 installed?" % grub2cfg)
             sys.exit(0)
 
 
         # load grub.cfg menu data
         self.grub2cfgData = StringIO.StringIO()
-        f = open("/boot/grub2/grub.cfg", "r")
+        f = open(grub2cfg, "r")
         self.grub2cfgData.write(f.read())
         f.close()
         del(f)
@@ -54,7 +57,7 @@ class grub2select():
 
         # load grub2 env data
         self.grubEnvData = StringIO.StringIO()
-        os.system("grub2-editenv list > /tmp/grub2-env.lst")
+        os.system("grub2-editenv " + grub2env + " list > /tmp/grub2-env.lst")
         f = open("/tmp/grub2-env.lst", "r")
         self.grubEnvData.write(f.read())
         f.close()
@@ -118,8 +121,8 @@ class grub2select():
             sys.exit(0)
         print("valid selection!\n")
 
-        os.system('grub2-set-default "{0}"'.format(self.menuData[selection]["id"]))
-        os.system('grub2-mkconfig -o /boot/grub2/grub.cfg')
+        os.system('grub2-set-default --boot-directory=' + grub2boot + ' "{0}"'.format(self.menuData[selection]["id"]))
+        os.system('grub2-mkconfig -o ' + grub2cfg)
 
     def showGrubDefault(self):
         if self.grubDefaultMatch is not None:
