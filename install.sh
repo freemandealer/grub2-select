@@ -3,6 +3,9 @@
 cp ./grub2-select.py /usr/sbin/grub2-select
 
 # hook it to the reboot utility
+if [ -e /usr/sbin/do_reboot ]; then
+	exit
+fi
 mv /usr/sbin/reboot /usr/sbin/do_reboot
 touch /usr/sbin/reboot
 chmod a+x /usr/sbin/reboot
